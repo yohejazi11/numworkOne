@@ -108,26 +108,18 @@ body {
     border: 2px solid var(--mainColor);
 }
 
-.TopSideSectionL {
+.left-side-top-section {
     width: 75%;
-    min-height: 200px;
+    min-height: 300px;
     border: 1px solid var(--mainBorderColor);
-    border-radius: 30px;
+    border-radius: 20px;
     margin-bottom: 20px;
     margin-left: 70px;
     background-color: var(--mainBGColor);
 
 }
 
-.left-side-top-section{
-    width: 75%;
-    min-height: 200px;
-    border: 1px solid var(--mainBorderColor);
-    border-radius: 30px;
-    margin-bottom: 20px;
-    margin-left: 70px;
-    background-color: var(--mainBGColor);
-}
+
 
 .AdsSideSectionL {
     width: 75%;
@@ -146,7 +138,7 @@ body {
     width: 75%;
     min-height: 200px;
     border: 1px solid var(--mainBorderColor);
-    border-radius: 30px;
+    border-radius: 20px;
     margin-bottom: 20px;
     margin-left: 70px;
 

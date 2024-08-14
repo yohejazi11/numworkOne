@@ -1,7 +1,11 @@
 async function uploadContent(content = 'posts') {
     const mainContentContainer = document.getElementById('mainContentDiv');
+    const TopSideSectionL = document.getElementById('TopSideSectionL');
     while (mainContentContainer.firstChild) {
         mainContentContainer.removeChild(mainContentContainer.firstChild);
+    }
+    while (TopSideSectionL.firstChild) {
+        TopSideSectionL.removeChild(TopSideSectionL.firstChild);
     }
     const tasksNavButton = document.getElementById('tasksNavButton');
     const postsNavButton = document.getElementById('postsNavButton');
@@ -136,6 +140,90 @@ async function uploadContent(content = 'posts') {
     }
 
     function renderTasks(tasks_arrays) {
+
+        // إنشاء عناصر الـ DOM
+        const searchTask = document.createElement('input');
+        const sortMainCategory = document.createElement('select');
+        const sortSubCategory = document.createElement('select');
+    
+        sortMainCategory.setAttribute('id', 'sortMainCategory');
+        sortSubCategory.setAttribute('id','sortSubCategory');
+        sortMainCategory.setAttribute('onchange','updateSubCategory()');
+    
+        TopSideSectionL.appendChild(searchTask);
+        TopSideSectionL.appendChild(sortMainCategory);
+        TopSideSectionL.appendChild(sortSubCategory);
+    
+        // جلب البيانات عند تحميل الصفحة
+        sortMainCategory.addEventListener('click', function () {
+            fetch('TaskCategories.json')
+                .then(response => response.json())
+                .then(data => {
+                    const sortMainCategory = document.getElementById('sortMainCategory');
+                    for (let category in data) {
+                        let option = document.createElement('option');
+                        option.value = category;
+                        option.textContent = category;
+                        sortMainCategory.appendChild(option);
+                    }
+                    // حفظ البيانات المستلمة للاستخدام لاحقاً
+                    window.categories = data;
+                });
+    
+            fetch('Tasktechnologies.json')
+                .then(response => response.json())
+                .then(data => {
+                    // حفظ البيانات المستلمة للاستخدام لاحقاً
+                    window.technologies = data;
+                });
+        });
+    
+        // دالة تحديث التصنيفات الفرعية
+        function updateSubCategory() {
+            const sortMainCategory = document.getElementById('sortMainCategory');
+            const subCategorySelect = document.getElementById('sortSubCategory');
+            const selectedCategory = sortMainCategory.value;
+    
+            subCategorySelect.innerHTML = '<option value="">اختر...</option>';
+            subCategorySelect.classList.add('show');
+            if (selectedCategory) {
+                const subCategories = window.categories[selectedCategory];
+                subCategories.forEach(subCategory => {
+                    let option = document.createElement('option');
+                    option.value = subCategory;
+                    option.textContent = subCategory;
+                    subCategorySelect.appendChild(option);
+                });
+            }
+        }
+    
+        // دالة تحديث التقنيات المطلوبة
+        function updateRequiredTechnologies() {
+            const subCategorySelect = document.getElementById('sortSubCategory');
+            const technologiesContainer = document.getElementById('technologiesSelect');
+            const selectedSubCategory = subCategorySelect.value;
+    
+            technologiesContainer.innerHTML = '';
+            technologiesContainer.classList.add('show');
+    
+            if (selectedSubCategory) {
+                const technologies = window.technologies[selectedSubCategory];
+                technologies.forEach(technology => {
+                    let label = document.createElement('label');
+                    let checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = technology;
+                    checkbox.name = 'technologies[]';
+    
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(technology));
+    
+                    technologiesContainer.appendChild(label);
+                });
+            }
+        }
+    
+        // ترتيب المهام حسب تاريخ النشر وعرضها
         tasks_arrays.sort((a, b) => new Date(b.time_date_task) - new Date(a.time_date_task));
         tasks_arrays.forEach(task => {
             const taskBox = document.createElement('div');
@@ -145,7 +233,7 @@ async function uploadContent(content = 'posts') {
             const taskDatePost = document.createElement('div');
             const taskDetails = document.createElement('div');
             const addOfferBtn = document.createElement('button');
-
+    
             taskBox.setAttribute('class', 'task-box');
             taskTitle.setAttribute('class', 'task-title-box');
             taskPostInfo.setAttribute('class', 'task-posted-info');
@@ -153,7 +241,7 @@ async function uploadContent(content = 'posts') {
             taskDatePost.setAttribute('class', 'task-posted-date');
             taskDetails.setAttribute('class', 'task-content');
             addOfferBtn.setAttribute('class', 'add-offer-button');
-
+    
             taskTitle.textContent = task.ProjectName;
             taskOwnerInfo.textContent = `الناشر: ${task.user_name}`;
             taskDatePost.textContent = `تم النشر: ${new Date(task.time_date_task).toLocaleString('ar-EG', {
@@ -161,21 +249,22 @@ async function uploadContent(content = 'posts') {
             })}`;
             taskDetails.textContent = task.ProjectDescription;
             addOfferBtn.textContent = 'قدم عرض';
-
+    
             taskPostInfo.appendChild(taskOwnerInfo);
             taskPostInfo.appendChild(taskDatePost);
             taskBox.appendChild(taskTitle);
             taskBox.appendChild(taskPostInfo);
             taskBox.appendChild(taskDetails);
-
+    
             // تأكد من أن زر التقديم يظهر فقط إذا كان المستخدم مسجلاً الدخول
             if (isUserSignIn > 0) {
                 taskBox.appendChild(addOfferBtn);
             }
-
+    
             mainContentContainer.appendChild(taskBox);
         });
     }
+    
 
     function renderJobs(jobs_arrays) {
         jobs_arrays.sort((a, b) => new Date(b.time_date_post) - new Date(a.time_date_post));
