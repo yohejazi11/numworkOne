@@ -148,7 +148,7 @@ async function uploadContent(content = 'posts') {
     
         sortMainCategory.setAttribute('id', 'sortMainCategory');
         sortSubCategory.setAttribute('id','sortSubCategory');
-        //sortMainCategory.setAttribute('onchange','updateSubCategory()');
+        sortMainCategory.setAttribute('onchange','updateSubCategory');
     
         TopSideSectionL.appendChild(searchTask);
         TopSideSectionL.appendChild(sortMainCategory);
@@ -156,10 +156,14 @@ async function uploadContent(content = 'posts') {
     
         // جلب البيانات عند تحميل الصفحة
         sortMainCategory.addEventListener('click', function () {
+
             fetch('TaskCategories.json')
                 .then(response => response.json())
                 .then(data => {
                     const sortMainCategory = document.getElementById('sortMainCategory');
+                    while(sortMainCategory.firstChild){
+                        sortMainCategory.removeChild(sortMainCategory.firstChild);
+                    }
                     for (let category in data) {
                         let option = document.createElement('option');
                         option.value = category;
@@ -176,7 +180,9 @@ async function uploadContent(content = 'posts') {
                     // حفظ البيانات المستلمة للاستخدام لاحقاً
                     window.technologies = data;
                 });
+                
         });
+
     
         // دالة تحديث التصنيفات الفرعية
         function updateSubCategory() {
