@@ -148,7 +148,7 @@ async function uploadContent(content = 'posts') {
     
         sortMainCategory.setAttribute('id', 'sortMainCategory');
         sortSubCategory.setAttribute('id','sortSubCategory');
-        sortMainCategory.setAttribute('onchange','updateSubCategory()');
+        //sortMainCategory.setAttribute('onchange','updateSubCategory()');
     
         TopSideSectionL.appendChild(searchTask);
         TopSideSectionL.appendChild(sortMainCategory);
