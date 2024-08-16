@@ -145,25 +145,50 @@ async function uploadContent(content = 'posts') {
         const searchTask = document.createElement('input');
         const sortMainCategory = document.createElement('select');
         const sortSubCategory = document.createElement('select');
-    
+        const technologiesContainer = document.createElement('div');
+        
+        technologiesContainer.setAttribute('id','technologiesSelect');
         sortMainCategory.setAttribute('id', 'sortMainCategory');
         sortSubCategory.setAttribute('id','sortSubCategory');
-        sortMainCategory.setAttribute('onchange','updateSubCategory');
+
+        /*technologiesContainer.setAttribute('class','technologies-select-category');*/
+
+
+
     
         TopSideSectionL.appendChild(searchTask);
         TopSideSectionL.appendChild(sortMainCategory);
         TopSideSectionL.appendChild(sortSubCategory);
-    
-        // جلب البيانات عند تحميل الصفحة
-        sortMainCategory.addEventListener('click', function () {
+        TopSideSectionL.appendChild(technologiesContainer);
 
+        // جلب البيانات عند تحميل الصفحة
+        function onElementReady(selector, callback) {
+            const element = document.querySelector(selector);
+            if (element) {
+                callback(element);
+            } else {
+                const observer = new MutationObserver((mutations, observerInstance) => {
+                    const element = document.querySelector(selector);
+                    if (element) {
+                        callback(element);
+                        observerInstance.disconnect();
+                    }
+                });
+        
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true
+                });
+            }
+        }
+        
+        onElementReady('#sortMainCategory', function(sortMainCategory) {
             fetch('TaskCategories.json')
                 .then(response => response.json())
                 .then(data => {
-                    const sortMainCategory = document.getElementById('sortMainCategory');
-                    while(sortMainCategory.firstChild){
-                        sortMainCategory.removeChild(sortMainCategory.firstChild);
-                    }
+                    let option = document.createElement('option');
+                    option.textContent = `اختر`;
+                    sortMainCategory.appendChild(option);
                     for (let category in data) {
                         let option = document.createElement('option');
                         option.value = category;
@@ -173,16 +198,23 @@ async function uploadContent(content = 'posts') {
                     // حفظ البيانات المستلمة للاستخدام لاحقاً
                     window.categories = data;
                 });
-    
+        
             fetch('Tasktechnologies.json')
                 .then(response => response.json())
                 .then(data => {
                     // حفظ البيانات المستلمة للاستخدام لاحقاً
                     window.technologies = data;
                 });
-                
+        });
+        
+
+        sortMainCategory.addEventListener('change',function (){
+            updateSubCategory();
         });
 
+        sortSubCategory.addEventListener('change',function (){
+            updateRequiredTechnologies();
+        });
     
         // دالة تحديث التصنيفات الفرعية
         function updateSubCategory() {
