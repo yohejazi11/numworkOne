@@ -94,31 +94,102 @@ async function uploadContent(content = 'mainProfile') {
     }
 
     function renderMainProfile(main_profile) {
-        const profileImageDiv = document.createElement('div');
+        const profileImagesDiv = document.createElement('div');
         const mainInfoProfile = document.createElement('div');
         const profileHeader = document.createElement('img');
         const profilePic = document.createElement('img');
         const fullName = document.createElement('div');
         const profileBaio = document.createElement('div');
+        const MedalsDiv = document.createElement('div');
+        const mainBaio = document.createElement('div');
 
-        profileBaio.setAttribute('class','profile-baio');
-        profileImageDiv.setAttribute('class', 'profile-image-div');
+        const profileMainNav = document.createElement('div');
+        const myPostButtonNavDiv = document.createElement('div');
+        const myPostButtonNav = document.createElement('button');
+        const myLikeButtonNavDiv = document.createElement('div');
+        const myLikeButtonNav = document.createElement('button');
+
+        MedalsDiv.setAttribute('class', 'Medals-div');
+        profileBaio.setAttribute('class', 'profile-baio');
+        profileImagesDiv.setAttribute('class', 'profile-image-div');
         mainInfoProfile.setAttribute('class', 'main-info-profile-div');
         profileHeader.setAttribute('class', 'main-profile-header');
         profilePic.setAttribute('class', 'main-profile-pic');
         fullName.setAttribute('class', 'profile-full-name');
+
+        profileMainNav.setAttribute('class', 'main-profile-nav');
+
         profileHeader.setAttribute('src', main_profile.data.profile_header);
         profilePic.setAttribute('src', main_profile.data.profile_pic);
         fullName.textContent = main_profile.data.first_name + `   ` + main_profile.data.last_name;
-        profileBaio.textContent= main_profile.data.user_baio;
-        
-        profileImageDiv.appendChild(profileHeader);
-        mainInfoProfile.appendChild(profilePic);
-        mainInfoProfile.appendChild(fullName);
-        mainInfoProfile.appendChild(profileBaio);
+        profileBaio.textContent = main_profile.data.user_baio;
 
-        mainContentContainer.appendChild(profileImageDiv);
+        myPostButtonNav.textContent = `منشوراتي`;
+        myLikeButtonNav.textContent = `اعجاباتي`;
+
+        myPostButtonNavDiv.appendChild(myPostButtonNav);
+        myLikeButtonNavDiv.appendChild(myLikeButtonNav);
+
+        profileImagesDiv.appendChild(profileHeader);
+        profileImagesDiv.appendChild(profilePic);
+        mainInfoProfile.appendChild(fullName);
+        mainInfoProfile.appendChild(MedalsDiv);
+        mainBaio.appendChild(profileBaio);
+
+        profileMainNav.appendChild(myPostButtonNavDiv);
+        profileMainNav.appendChild(myLikeButtonNavDiv);
+
+        mainContentContainer.appendChild(profileImagesDiv);
         mainContentContainer.appendChild(mainInfoProfile);
+        mainContentContainer.appendChild(mainBaio);
+        mainContentContainer.appendChild(profileMainNav);
+        myPostButtonNav.addEventListener('click', () => mainProfileContent('mypost'));
+        myLikeButtonNav.addEventListener('click', () => mainProfileContent('mylike'));
+
+        const subContentContainer = document.createElement('div');
+        subContentContainer.setAttribute('class','sub-content-container');
+        mainProfileContent();
+
+        function mainProfileContent(value = 'mypost') {
+            while (subContentContainer.firstChild) {
+                subContentContainer.removeChild(subContentContainer.firstChild);
+            }
+            switch (value) {
+                case 'mypost': {
+
+                    fetch('getAccountApi.php?action=getPosts')
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.status === 'success' && Array.isArray(data.data)) {
+                                data.data.forEach(post => {
+                                    const postDiv = document.createElement('div');
+                                    postDiv.setAttribute('class', 'my-post-div');
+                                    postDiv.textContent = `${post.user_id}`;
+                                    subContentContainer.appendChild(postDiv);
+                                    mainContentContainer.appendChild(subContentContainer);
+
+                                });
+                            } else {
+                                console.error('Error: Unexpected data format', data);
+                            }
+                        })
+                        .catch(error => console.error('Error fetching posts:', error));
+                    break;
+                }
+                case 'mylike': {
+                    while (subContentContainer.firstChild) {
+                        subContentContainer.removeChild(subContentContainer.firstChild);
+                    }
+                    // الكود الخاص بهذه الحالة هنا
+                    break;
+                }
+                default: {
+                    console.log('Invalid option');
+                }
+            }
+
+        }
+
     }
 
     function renderWorkGallary(work_gallary) {

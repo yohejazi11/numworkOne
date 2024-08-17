@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // نقل الملف إلى مجلد الرفع
         if (move_uploaded_file($image['tmp_name'], $uploadFile)) {
             // حفظ البيانات في قاعدة البيانات
-            $stmt = $con->prepare('INSERT INTO generalposts (text_post, user_id_post, image_post_one, time_date_post) VALUES (?, ?, ?, ?)');
+            $stmt = $con->prepare('INSERT INTO generalposts (text_post, user_id, image_post_one, time_date_post) VALUES (?, ?, ?, ?)');
             $stmt->bind_param('siss', $content, $myPost, $uploadFile, $postTime);
             $stmt->execute();
 
@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } else {
         // إذا لم يتم رفع صورة
-        $stmt = $con->prepare('INSERT INTO generalposts (text_post, user_id_post, time_date_post) VALUES (?, ?, ?)');
+        $stmt = $con->prepare('INSERT INTO generalposts (text_post, user_id, time_date_post) VALUES (?, ?, ?)');
         $stmt->bind_param('sis', $content, $myPost, $postTime);
         $stmt->execute();
 

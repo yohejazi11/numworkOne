@@ -678,6 +678,10 @@ div {
     display: block;
 }
 
+.task-container{
+    width: 100%;
+}
+
 .task-box {
     position: relative;
     width: 100%;
@@ -934,6 +938,8 @@ div {
 
 
 .main-info-profile-div{
+    display: flex;
+    flex-direction:row-reverse;
     width: 100%;
     text-align: right;
     position: relative;
@@ -976,4 +982,44 @@ div {
     padding-right: 20px;
     text-align: right;
     direction: rtl;
+}
+
+.main-profile-nav{
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 60px;
+    border-bottom: 1px solid var(--mainBorderColor);
+    box-shadow: var(--mainShadow);
+}
+
+.main-profile-nav div{
+    flex: 1;
+    width: 100%;
+    text-align: center;
+}
+
+.main-profile-nav div button{
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    border: none;
+    font-size: 20px;
+    font-family: var(--mainFont);
+    color: var(--mainColor);
+    background-color: transparent;
+}
+
+.main-profile-nav div button:hover{
+    background-color: var(--buttonBGcolorHover);
+}
+
+.sub-content-container{
+    width: 100%;
+
+}
+.my-post-div{
+    display: block;
+    width: 100%;
+    min-height: 100px;
 }

@@ -14,12 +14,12 @@ $result = $stmt->get_result();
 if ($result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $_SESSION['userID'] = $row['user_id'];
-    header('Location: http://localhost/numwork/index.html');
+    header('Location: http://localhost/numworkOne/index.html');
     exit();
 } else {
     // رسالة خطأ إذا كانت بيانات تسجيل الدخول غير صحيحة
     $_SESSION['login_error'] = "Invalid email or password";
-    header('Location: http://localhost/numwork/index.html');
+    header('Location: http://localhost/numworkOne/index.html');
     exit();
 }
 

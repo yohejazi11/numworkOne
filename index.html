@@ -29,7 +29,7 @@
                 var response = JSON.parse(xhr.responseText);
                 // عرض القيمة في الصفحة HTML
                 if (response.user_id == 0) {
-                    const profileSideSection = document.getElementById('profileSideSectionL');
+                    const TopSideSection = document.getElementById('TopSideSectionL');
                     const signinBTNcreate = document.createElement('button');
                     const signupBTNcreate = document.createElement('button');
 
@@ -38,7 +38,7 @@
                     signupBTNcreate.setAttribute('class', 'sideSectionRigesterBTN');
                     signupBTNcreate.textContent = 'تسجيل';
 
-                    profileSideSection.appendChild(signinBTNcreate);
+                    TopSideSection.appendChild(signinBTNcreate);
                     signinBTNcreate.addEventListener('click', function () {
                         document.getElementById('background-pup').classList.add('background-bulrer-pup-on');
                         document.getElementById('userAccountInfo').classList.remove('open-pup');
@@ -46,7 +46,7 @@
                         document.getElementById('userContactInfoDiv').classList.remove('open-pup');
                         document.getElementById('signInFormDiv').classList.add('open-pup');
                     });
-                    profileSideSection.appendChild(signupBTNcreate);
+                    TopSideSection.appendChild(signupBTNcreate);
                     signupBTNcreate.addEventListener('click', function () {
                         document.getElementById('signInFormDiv').classList.remove('open-pup');
                         document.getElementById('background-pup').classList.add('background-bulrer-pup-on');
@@ -55,12 +55,7 @@
                 }
                 else if (response.user_id > 0) {
                     const mainContentContianer = document.getElementById('mainContentDiv');
-
-
-
                     const TopSideSection = document.getElementById('TopSideSectionL');
-
-
                 }
             }
         };

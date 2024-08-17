@@ -145,21 +145,20 @@ async function uploadContent(content = 'posts') {
         const searchTask = document.createElement('input');
         const sortMainCategory = document.createElement('select');
         const sortSubCategory = document.createElement('select');
-        const technologiesContainer = document.createElement('div');
-        
-        technologiesContainer.setAttribute('id','technologiesSelect');
+        const taskContainer = document.createElement('div');  // Container for tasks
+
+        searchTask.setAttribute('type', 'text');
+        searchTask.setAttribute('placeholder', 'ابحث عن المهام...');
+        searchTask.setAttribute('id', 'searchTask');
+
         sortMainCategory.setAttribute('id', 'sortMainCategory');
-        sortSubCategory.setAttribute('id','sortSubCategory');
+        sortSubCategory.setAttribute('id', 'sortSubCategory');
+        taskContainer.setAttribute('id', 'taskContainer');
 
-        /*technologiesContainer.setAttribute('class','technologies-select-category');*/
-
-
-
-    
         TopSideSectionL.appendChild(searchTask);
         TopSideSectionL.appendChild(sortMainCategory);
         TopSideSectionL.appendChild(sortSubCategory);
-        TopSideSectionL.appendChild(technologiesContainer);
+        mainContentContainer.appendChild(taskContainer);  // Append the task container
 
         // جلب البيانات عند تحميل الصفحة
         function onElementReady(selector, callback) {
@@ -174,15 +173,15 @@ async function uploadContent(content = 'posts') {
                         observerInstance.disconnect();
                     }
                 });
-        
+
                 observer.observe(document.body, {
                     childList: true,
                     subtree: true
                 });
             }
         }
-        
-        onElementReady('#sortMainCategory', function(sortMainCategory) {
+
+        onElementReady('#sortMainCategory', function (sortMainCategory) {
             fetch('TaskCategories.json')
                 .then(response => response.json())
                 .then(data => {
@@ -198,111 +197,125 @@ async function uploadContent(content = 'posts') {
                     // حفظ البيانات المستلمة للاستخدام لاحقاً
                     window.categories = data;
                 });
-        
-            fetch('Tasktechnologies.json')
-                .then(response => response.json())
-                .then(data => {
-                    // حفظ البيانات المستلمة للاستخدام لاحقاً
-                    window.technologies = data;
-                });
         });
-        
 
-        sortMainCategory.addEventListener('change',function (){
+        // دالة تصفية المهام حسب التصنيف والبحث
+        function filterTasks() {
+            const selectedCategory = sortMainCategory.value;
+            const selectedSubCategory = sortSubCategory.value;
+            const searchTerm = searchTask.value.toLowerCase();
+
+            const filteredTasks = tasks_arrays.filter(task => {
+                let categoryMatch = true;
+                let subCategoryMatch = true;
+                let searchMatch = true;
+
+                // تطابق التصنيف الرئيسي
+                if (selectedCategory) {
+                    categoryMatch = task.MainCategoryID === selectedCategory;
+                }
+
+                // تطابق التصنيف الفرعي
+                if (selectedSubCategory) {
+                    subCategoryMatch = task.SubCategoryID === selectedSubCategory;
+                }
+
+                // تطابق البحث في العنوان والوصف
+                if (searchTerm) {
+                    searchMatch = task.ProjectName.toLowerCase().includes(searchTerm) ||
+                        task.ProjectDescription.toLowerCase().includes(searchTerm);
+                }
+
+                return categoryMatch && subCategoryMatch && searchMatch;
+            });
+
+            renderFilteredTasks(filteredTasks);
+        }
+
+        // دالة عرض المهام المفلترة
+        function renderFilteredTasks(tasks) {
+            taskContainer.innerHTML = ''; // إفراغ المحتوى الحالي للمهام فقط
+            tasks.forEach(task => {
+                const taskBox = document.createElement('div');
+                const taskTitle = document.createElement('div');
+                const taskPostInfo = document.createElement('div');
+                const taskOwnerInfo = document.createElement('div');
+                const taskDatePost = document.createElement('div');
+                const taskDetails = document.createElement('div');
+                const addOfferBtn = document.createElement('button');
+
+                taskBox.setAttribute('class', 'task-box');
+                taskTitle.setAttribute('class', 'task-title-box');
+                taskPostInfo.setAttribute('class', 'task-posted-info');
+                taskOwnerInfo.setAttribute('class', 'task-owner-user-name');
+                taskDatePost.setAttribute('class', 'task-posted-date');
+                taskDetails.setAttribute('class', 'task-content');
+                addOfferBtn.setAttribute('class', 'add-offer-button');
+
+                taskTitle.textContent = task.ProjectName;
+                taskOwnerInfo.textContent = `الناشر: ${task.user_name}`;
+                taskDatePost.textContent = `تم النشر: ${new Date(task.time_date_task).toLocaleString('ar-EG', {
+                    year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'
+                })}`;
+                taskDetails.textContent = task.ProjectDescription;
+                addOfferBtn.textContent = 'قدم عرض';
+
+                taskPostInfo.appendChild(taskOwnerInfo);
+                taskPostInfo.appendChild(taskDatePost);
+                taskBox.appendChild(taskTitle);
+                taskBox.appendChild(taskPostInfo);
+                taskBox.appendChild(taskDetails);
+
+                // تأكد من أن زر التقديم يظهر فقط إذا كان المستخدم مسجلاً الدخول
+                if (isUserSignIn > 0) {
+                    taskBox.appendChild(addOfferBtn);
+                }
+
+                taskContainer.appendChild(taskBox);  // Append tasks to taskContainer
+            });
+        }
+
+        // تحديث التصنيفات الفرعية عند تغيير التصنيف الرئيسي
+        sortMainCategory.addEventListener('change', function () {
             updateSubCategory();
+            filterTasks();
         });
 
-        sortSubCategory.addEventListener('change',function (){
-            updateRequiredTechnologies();
+        // تحديث المهام عند تغيير التصنيف الفرعي
+        sortSubCategory.addEventListener('change', function () {
+            filterTasks();
         });
-    
+
+        // تحديث المهام عند البحث
+        searchTask.addEventListener('input', function () {
+            filterTasks();
+        });
+
         // دالة تحديث التصنيفات الفرعية
         function updateSubCategory() {
-            const sortMainCategory = document.getElementById('sortMainCategory');
-            const subCategorySelect = document.getElementById('sortSubCategory');
             const selectedCategory = sortMainCategory.value;
-    
-            subCategorySelect.innerHTML = '<option value="">اختر...</option>';
-            subCategorySelect.classList.add('show');
+            sortSubCategory.innerHTML = '<option value="">اختر...</option>';
+            sortSubCategory.classList.add('show');
+
             if (selectedCategory) {
                 const subCategories = window.categories[selectedCategory];
                 subCategories.forEach(subCategory => {
                     let option = document.createElement('option');
                     option.value = subCategory;
                     option.textContent = subCategory;
-                    subCategorySelect.appendChild(option);
+                    sortSubCategory.appendChild(option);
                 });
             }
         }
-    
-        // دالة تحديث التقنيات المطلوبة
-        function updateRequiredTechnologies() {
-            const subCategorySelect = document.getElementById('sortSubCategory');
-            const technologiesContainer = document.getElementById('technologiesSelect');
-            const selectedSubCategory = subCategorySelect.value;
-    
-            technologiesContainer.innerHTML = '';
-            technologiesContainer.classList.add('show');
-    
-            if (selectedSubCategory) {
-                const technologies = window.technologies[selectedSubCategory];
-                technologies.forEach(technology => {
-                    let label = document.createElement('label');
-                    let checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.value = technology;
-                    checkbox.name = 'technologies[]';
-    
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(technology));
-    
-                    technologiesContainer.appendChild(label);
-                });
-            }
-        }
-    
-        // ترتيب المهام حسب تاريخ النشر وعرضها
-        tasks_arrays.sort((a, b) => new Date(b.time_date_task) - new Date(a.time_date_task));
-        tasks_arrays.forEach(task => {
-            const taskBox = document.createElement('div');
-            const taskTitle = document.createElement('div');
-            const taskPostInfo = document.createElement('div');
-            const taskOwnerInfo = document.createElement('div');
-            const taskDatePost = document.createElement('div');
-            const taskDetails = document.createElement('div');
-            const addOfferBtn = document.createElement('button');
-    
-            taskBox.setAttribute('class', 'task-box');
-            taskTitle.setAttribute('class', 'task-title-box');
-            taskPostInfo.setAttribute('class', 'task-posted-info');
-            taskOwnerInfo.setAttribute('class', 'task-owner-user-name');
-            taskDatePost.setAttribute('class', 'task-posted-date');
-            taskDetails.setAttribute('class', 'task-content');
-            addOfferBtn.setAttribute('class', 'add-offer-button');
-    
-            taskTitle.textContent = task.ProjectName;
-            taskOwnerInfo.textContent = `الناشر: ${task.user_name}`;
-            taskDatePost.textContent = `تم النشر: ${new Date(task.time_date_task).toLocaleString('ar-EG', {
-                year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric'
-            })}`;
-            taskDetails.textContent = task.ProjectDescription;
-            addOfferBtn.textContent = 'قدم عرض';
-    
-            taskPostInfo.appendChild(taskOwnerInfo);
-            taskPostInfo.appendChild(taskDatePost);
-            taskBox.appendChild(taskTitle);
-            taskBox.appendChild(taskPostInfo);
-            taskBox.appendChild(taskDetails);
-    
-            // تأكد من أن زر التقديم يظهر فقط إذا كان المستخدم مسجلاً الدخول
-            if (isUserSignIn > 0) {
-                taskBox.appendChild(addOfferBtn);
-            }
-    
-            mainContentContainer.appendChild(taskBox);
-        });
+
+        // عرض المهام المفلترة عند تحميل الصفحة
+        filterTasks();
     }
-    
+
+
+
+
+
 
     function renderJobs(jobs_arrays) {
         jobs_arrays.sort((a, b) => new Date(b.time_date_post) - new Date(a.time_date_post));
