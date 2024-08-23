@@ -146,25 +146,43 @@ async function uploadContent(content = 'mainProfile') {
         myPostButtonNav.addEventListener('click', () => mainProfileContent('mypost'));
         myLikeButtonNav.addEventListener('click', () => mainProfileContent('mylike'));
 
+        myPostButtonNav.setAttribute('id', 'myPostButtonNav');
+        myLikeButtonNav.setAttribute('id', 'myLikeButtonNav');
+        myPostButtonNav.setAttribute('class', 'my-post-button-nav');
+        myLikeButtonNav.setAttribute('class', 'my-like-button-nav');
         const subContentContainer = document.createElement('div');
-        subContentContainer.setAttribute('class','sub-content-container');
+        subContentContainer.setAttribute('class', 'sub-content-container');
         mainProfileContent();
 
         function mainProfileContent(value = 'mypost') {
+            const myPostButtonNav = document.getElementById('myPostButtonNav');
+            const myLikeButtonNav = document.getElementById('myLikeButtonNav');
             while (subContentContainer.firstChild) {
                 subContentContainer.removeChild(subContentContainer.firstChild);
             }
             switch (value) {
-                case 'mypost': {
-
+                case 'mypost':
+                    updateUI(myPostButtonNav, [myLikeButtonNav,myPostButtonNav]);
                     fetch('getAccountApi.php?action=getPosts')
                         .then(response => response.json())
                         .then(data => {
                             if (data.status === 'success' && Array.isArray(data.data)) {
                                 data.data.forEach(post => {
                                     const postDiv = document.createElement('div');
+                                    const postTopBar=document.createElement('div');
+                                    const postEditMenu=document.createElement('button');
+                                    const postText=document.createElement('div');
+                                    const postMdia=document.createElement('div');
+                                    const postActivity=document.createElement('div');
                                     postDiv.setAttribute('class', 'my-post-div');
-                                    postDiv.textContent = `${post.user_id}`;
+                                    postTopBar.setAttribute('class','post-top-bar');
+                                    postEditMenu.setAttribute('class','post-option-button');
+                                    postTopBar.appendChild(postEditMenu);
+                                    postDiv.appendChild(postTopBar);
+                                    postDiv.appendChild(postText);
+                                    postDiv.appendChild(postMdia);
+                                    postDiv.appendChild(postActivity);
+                                    postText.textContent=`${post.text_post}`;
                                     subContentContainer.appendChild(postDiv);
                                     mainContentContainer.appendChild(subContentContainer);
 
@@ -175,18 +193,18 @@ async function uploadContent(content = 'mainProfile') {
                         })
                         .catch(error => console.error('Error fetching posts:', error));
                     break;
-                }
-                case 'mylike': {
-                    while (subContentContainer.firstChild) {
-                        subContentContainer.removeChild(subContentContainer.firstChild);
-                    }
+
+                case 'mylike':
+                    updateUI(myLikeButtonNav, [myLikeButtonNav,myPostButtonNav]);
+
+                
                     // الكود الخاص بهذه الحالة هنا
                     break;
-                }
-                default: {
+
+                default:
                     console.log('Invalid option');
-                }
             }
+
 
         }
 

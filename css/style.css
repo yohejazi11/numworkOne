@@ -158,10 +158,11 @@ body {
 
 /* تغيير شكل الشريط نفسه */
 ::-webkit-scrollbar {
-    width: 5px;
+    width: 1px;
     /* عرض الشريط */
     height: 12px;
     /* ارتفاع الشريط في حالة التمرير الأفقي */
+    float: unset;
 }
 
 /* تغيير شكل مسار الشريط */
@@ -1010,6 +1011,16 @@ div {
     background-color: transparent;
 }
 
+.my-post-button-nav.selectedButton{
+    padding-bottom: 0px;
+    border-bottom: 2px solid var(--mainColor);
+}
+
+.my-like-button-nav.selectedButton{
+    padding-bottom: 0px;
+    border-bottom: 2px solid var(--mainColor);
+}
+
 .main-profile-nav div button:hover{
     background-color: var(--buttonBGcolorHover);
 }
@@ -1021,5 +1032,18 @@ div {
 .my-post-div{
     display: block;
     width: 100%;
-    min-height: 100px;
+    min-height: 150px;
+    border-bottom: 1px solid var(--mainBorderColor);
+}
+
+.post-top-bar{
+    display: block;
+}
+.post-option-button{
+    
+    height: 32px;
+    width: 32px;
+    background-image: url('../images/icons/option.png');
+    background-color: transparent;
+    border: none;
 }
